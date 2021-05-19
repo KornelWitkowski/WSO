@@ -83,9 +83,11 @@ class LoginWidget(QWidget):
 
         if answer.decode() == "Ok":
             self.setParent(None)
-            Parent.LoggedinWin = LoggedinWindow(self)
-            Parent.LoggedinWin.setFixedSize(500, 250)
-            Parent.layout.addWidget(Parent.LoggedinWin, *(1, 1, 1, 1))
+            Parent.LoggedinWin = LoggedinWindow(Parent)
+            Parent.LoggedinWin.setFixedSize(800, 400)
+            Parent.layout.addWidget(Parent.LoggedinWin)
+        else:
+            QMessageBox.about(self, "Information", answer.decode())
 
 
 class LoggedinWindow(QWidget):
@@ -96,26 +98,29 @@ class LoggedinWindow(QWidget):
         s.send(str.encode("Give me all that you got now!"))
         answer = s.recv(BUFFER_SIZE)
 
-        #DecodedData = ast.literal_eval(answer.decode()) Czemu to nie działa?
         json_acceptable_string = answer.decode().replace("'", "\"")
         Data = json.loads(json_acceptable_string)
 
         self.layout = QGridLayout(self)
         self.labelTime = QLabel(QDateTime.currentDateTime().toString('yyyy-MM-dd hh:mm:ss'))
+        self.labelTime.setFont(QFont('Arial', 12))
         self.timer = QTimer()
         self.timer.timeout.connect(self.show_time)
-        self.layout.addWidget(self.labelTime, 0, 1, 1, 2)
+        self.layout.addWidget(self.labelTime, 0, 0, 1, 3)
         self.timer.start(1000)
 
         self.labelName = QLabel(Data["name"] + " " + Data["surname"])
-        self.layout.addWidget(self.labelName, 1, 1, 1, 2)
+        self.labelName.setFont(QFont('Arial', 12))
+        self.layout.addWidget(self.labelName, 1, 0, 1, 2)
 
         self.labelBalance = QLabel("Balance:  " + str(Data["balance"]))
-        self.layout.addWidget(self.labelBalance, 2, 1, 1, 2)
+        self.labelBalance.setFont(QFont('Arial', 12))
+        self.layout.addWidget(self.labelBalance, 2, 0, 1, 3)
 
         self.textboxAmount = QLineEdit(self)
-        self.textboxAmount.setFixedSize(100, 25)
-        self.layout.addWidget(self.textboxAmount, *(3, 1, 1, 1))
+        self.textboxAmount.setFixedSize(310, 40)
+        self.textboxAmount.setFont(QFont('Arial', 12))
+        self.layout.addWidget(self.textboxAmount, *(3, 0, 1, 3))
 
         btns = {(4, 0): "Deposit", (4, 1): "Payout",
                 (5, 0): "History", (5, 1): "Data",
@@ -126,14 +131,14 @@ class LoggedinWindow(QWidget):
             btn = QPushButton()
             btn.setText(name)
             btn.clicked.connect(self.push_button)
+            btn.setFixedSize(150, 45)
             btn.setObjectName(name)
             self.layout.addWidget(btn, x, y)
 
         self.setBtn = QPushButton(text='Log out')
-        self.setBtn.setFont(QFont('Arial', 14))
-        self.setBtn.setFixedSize(200, 45)
+        self.setBtn.setFixedSize(310, 45)
         self.setBtn.clicked.connect(self.log_out)
-        self.layout.addWidget(self.setBtn, *(8, 0))
+        self.layout.addWidget(self.setBtn, *(8, 0, 1, 2))
 
     def push_button(self):
         sendingButtonName = self.sender().objectName()
@@ -216,11 +221,11 @@ class LogoutWidget(QWidget):
         self.labelName.setAlignment(Qt.AlignLeft)
         self.layout.addWidget(self.labelName, *(1, 0))
 
-        self.bt1 = QPushButton(text='Zamknij')
-        self.bt1.setFont(QFont('Arial', 14))
-        self.bt1.setFixedSize(200, 45)
-        self.bt1.clicked.connect(self.close)
-        self.layout.addWidget(self.bt1, *(8, 0))
+        self.closeBtn = QPushButton(text='Close')
+        self.closeBtn.setFont(QFont('Arial', 14))
+        self.closeBtn.setFixedSize(200, 45)
+        self.closeBtn.clicked.connect(self.close)
+        self.layout.addWidget(self.closeBtn, *(8, 0))
 
         return
 
@@ -228,10 +233,10 @@ class LogoutWidget(QWidget):
         Parent = self.parent().parent()
         self.setParent(None)
 
-        Parent.LoginWin.textboxLogin.clear()
-        Parent.LoginWin.textboxPassword.clear()
+        Parent.LoginWid.textboxLogin.clear()
+        Parent.LoginWid .textboxPassword.clear()
 
-        Parent.layout.addWidget(Parent.LoginWin, *(1, 1, 1, 1))
+        Parent.layout.addWidget(Parent.LoginWid, *(1, 1, 1, 1))
 
 
 class ChangePasswordWindow(QMainWindow):
@@ -339,9 +344,7 @@ class DataWindow(QMainWindow):
             self.label.setAlignment(Qt.AlignLeft)
             self.layout.addWidget(self.label, *(count, 0, 1, 1))
 
-
         self.show
-
 
 
 if __name__ == '__main__':
